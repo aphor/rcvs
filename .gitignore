@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 $py.class
 
-# C extensions (for example, numpy)
+# C extensions (may be present in some build systems)
 *.so
 
 # Distribution / packaging Python
@@ -13,82 +13,89 @@ develop-eggs/
 dist/
 downloads/
 egg-info/
-installed-files.txt
-MANIFEST
-
-# PyInstaller
-#  Note: if you have chaining commands, put them all on one line
-#  pyinstaller -F -w --clean --name myapp myapp.py
-*.spec
-
-# Distribution / packaging Python
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-egg-info/
-installed-files.txt
-MANIFEST
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+inst/lib/python
+lib/python*/
+local/
+parts/
+sdist/
+templates/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-Thumbs.db
+.pycharm/
+.cache/
 
 # Virtual environments
 venv/
 env/
 ENV/
+.venv/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Environment variables
+.env
+.env.local
 
-# PyCharm
-.pycharm/
+# OS generated files
+.DS_Store
+Thumbs.db
 
-# Test coverage
-htmlcov/
+# Logs
+*.log
+
+# Temporary files
+*~
+*.tmp
+*.temp
+
+# Python coverage
 .coverage
 .coverage.*
-coverage.xml
+htmlcov/
+.nox/
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-media/
+# IDE specific files
+*pycache*/
+*.pyc
 
-# Flask stuff:
-instance/
-.webassets-cache
+# Django cache
+.Django_cache/
 
-# Documentation
-docs/_build/
+# Flask cache
+.flask_cache/
 
-# IDE auto-generated files
-.vscode/
-.idea/
+# Test coverage
+.coverage
+.coverage.*
+
+# Pytest cache
+.pytest_cache/
+
+# Python virtual environment directories
+venv/
+env/
+virtualenv/
+.venv/
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE specific files
 *.swp
 *.swo
 
-# Python cache
-__pycache__/
-
-# Temporary files
-*.tmp
-*.temp
+# Git
+.git/

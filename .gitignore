@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+$py.class
+
+# C extensions (for example, numpy)
+*.so
+
+# Distribution / packaging Python
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+egg-info/
+installed-files.txt
+MANIFEST
+
+# PyInstaller
+#  Note: if you have chaining commands, put them all on one line
+#  pyinstaller -F -w --clean --name myapp myapp.py
+*.spec
+
+# Distribution / packaging Python
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+egg-info/
+installed-files.txt
+MANIFEST
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.pycharm/

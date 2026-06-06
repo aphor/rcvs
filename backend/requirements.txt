@@ -1,0 +1,31 @@
+# Core Python dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Werkzeug==2.3.7
+
+# Data processing and utilities
+numpy==1.24.3
+pandas==2.0.3
+
+# Testing
+pytest==7.4.2
+pytest-cov==4.1.0
+coverage==7.3.2
+
+# Documentation
+Sphinx==7.2.5
+sphinx-rtd-theme==1.3.0
+
+# Development tools
+black==23.9.1
+flake8==6.0.0
+isort==5.12.0
+
+# Web framework for frontend (if using React)
+react==18.2.0
+react-dom==18.2.0
+
+# Mobile UI components (if using React Native or similar)
+react-native==0.72.4

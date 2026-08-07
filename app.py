@@ -1,27 +1,80 @@
 from flask import Flask, jsonify, render_template_string
 from flask_cors import CORS
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+
+from backend.models import Contest, Candidate, Election, Ballot, BallotStatus, Voter, Persistent, SqlitePersistence
 
 app = Flask(__name__)
 CORS(app)
 
-# Sample data for ranked choice voting
-sample_ballots = [
-    {
-        "id": 1,
-        "choices": ["Alice", "Bob", "Charlie"],
-        "votes": [1, 2, 3]
-    },
-    {
-        "id": 2,
-        "choices": ["Bob", "Alice", "Charlie"],
-        "votes": [1, 2, 3]
-    },
-    {
-        "id": 3,
-        "choices": ["Charlie", "Alice", "Bob"],
-        "votes": [1, 2, 3]
-    }
+sample_election = Election(
+    id="election-1",
+    name="Sample Election",
+    description="A sample election containing multiple contests",
+)
+
+sample_contests = [
+    Contest(
+        id="rcv-1",
+        name="Sample Ranked Choice Voting Contest",
+        election_id="election-1",
+        description="A sample contest to demonstrate RCV functionality",
+    ),
 ]
+
+sample_candidates = [
+    Candidate(
+        id="cand-1",
+        contest_id="rcv-1",
+        name="Alice Johnson",
+        description="Experienced in local government and community organizing",
+    ),
+    Candidate(
+        id="cand-2",
+        contest_id="rcv-1",
+        name="Bob Smith",
+        description="Business leader with focus on economic development",
+    ),
+    Candidate(
+        id="cand-3",
+        contest_id="rcv-1",
+        name="Charlie Brown",
+        description="Advocate for environmental protection and social justice",
+    ),
+]
+
+sample_ballots = [
+    Ballot(
+        id="ballot-1",
+        election_id="election-1",
+        contest_ids=["rcv-1"],
+        status=BallotStatus.ISSUED,
+    ),
+    Ballot(
+        id="ballot-2",
+        election_id="election-1",
+        contest_ids=["rcv-1"],
+        status=BallotStatus.VOTED,
+        cast_data={"rcv-1": ["Alice Johnson", "Bob Smith", "Charlie Brown"]},
+    ),
+    Ballot(
+        id="ballot-3",
+        election_id="election-1",
+        contest_ids=["rcv-1"],
+        status=BallotStatus.COUNTED,
+    ),
+]
+
+sample_voters = [
+    Voter(id="voter-1", username="alice_v", email="alice@example.com"),
+    Voter(id="voter-2", username="bob_v", email="bob@example.com"),
+]
+
+# Example of how to use the SqlitePersistence implementation
+# sqlite_persistence = SqlitePersistence("rcv_database.db")
 
 @app.route('/')
 def index():
@@ -79,31 +132,31 @@ def index():
 <body>
     <div class="container">
         <h1>Ranked Choice Voting System</h1>
-        
+
         <div class="ballot">
             <h2>Ballot 1</h2>
-            <div class="choice">1st Choice: Alice</div>
-            <div class="choice">2nd Choice: Bob</div>
-            <div class="choice">3rd Choice: Charlie</div>
+            <div class="choice">1st Choice: Alice Johnson</div>
+            <div class="choice">2nd Choice: Bob Smith</div>
+            <div class="choice">3rd Choice: Charlie Brown</div>
             <button class="vote-button" onclick="submitVote(1)">Submit Vote</button>
         </div>
-        
+
         <div class="ballot">
             <h2>Ballot 2</h2>
-            <div class="choice">1st Choice: Bob</div>
-            <div class="choice">2nd Choice: Alice</div>
-            <div class="choice">3rd Choice: Charlie</div>
+            <div class="choice">1st Choice: Bob Smith</div>
+            <div class="choice">2nd Choice: Alice Johnson</div>
+            <div class="choice">3rd Choice: Charlie Brown</div>
             <button class="vote-button" onclick="submitVote(2)">Submit Vote</button>
         </div>
-        
+
         <div class="ballot">
             <h2>Ballot 3</h2>
-            <div class="choice">1st Choice: Charlie</div>
-            <div class="choice">2nd Choice: Alice</div>
-            <div class="choice">3rd Choice: Bob</div>
+            <div class="choice">1st Choice: Charlie Brown</div>
+            <div class="choice">2nd Choice: Alice Johnson</div>
+            <div class="choice">3rd Choice: Bob Smith</div>
             <button class="vote-button" onclick="submitVote(3)">Submit Vote</button>
         </div>
-        
+
         <div id="result"></div>
     </div>
 
@@ -111,30 +164,40 @@ def index():
         function submitVote(ballotId) {
             fetch('/api/vote', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ballot_id: ballotId
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ballot_id: ballotId })
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').innerHTML = 
+                document.getElementById('result').innerHTML =
                     '<h3>Vote Submitted!</h3><p>' + data.message + '</p>';
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            .catch(error => { console.error('Error:', error); });
         }
     </script>
 </body>
 </html>
 ''')
 
+@app.route('/api/elections')
+def get_elections():
+    return jsonify(sample_election.to_dict())
+
+@app.route('/api/contests')
+def get_contests():
+    return jsonify([c.to_dict() for c in sample_contests])
+
+@app.route('/api/candidates')
+def get_candidates():
+    return jsonify([c.to_dict() for c in sample_candidates])
+
 @app.route('/api/ballots')
 def get_ballots():
-    return jsonify(sample_ballots)
+    return jsonify([b.to_dict() for b in sample_ballots])
+
+@app.route('/api/voters')
+def get_voters():
+    return jsonify([v.to_dict() for v in sample_voters])
 
 @app.route('/api/vote', methods=['POST'])
 def vote():

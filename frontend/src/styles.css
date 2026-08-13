@@ -1,0 +1,416 @@
+:root {
+  --bg: #faf6ec;
+  --surface: #ffffff;
+  --ink: #2c2417;
+  --muted: #7a6f5c;
+  --gold: #b8860b;
+  --gold-dark: #94690a;
+  --amber: #e0a92b;
+  --green: #3f7d3f;
+  --red: #b3402f;
+  --line: #e7ddc7;
+  --shadow: 0 2px 8px rgba(60, 45, 10, 0.12);
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Layout ---------- */
+.screen {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px 16px 96px;
+  min-height: 100vh;
+}
+
+.app-screen {
+  position: relative;
+  padding-top: 72px; /* room for floating top button */
+}
+
+.app-header {
+  text-align: center;
+  margin: 8px 0 20px;
+}
+.app-header.compact {
+  margin: 0 0 12px;
+}
+.app-header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--gold-dark);
+}
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+/* ---------- Forms ---------- */
+.form h2 {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+}
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+.field-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.input {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  color: var(--ink);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+}
+.input-error {
+  border-color: var(--red);
+}
+.field-error {
+  display: block;
+  color: var(--red);
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.btn:disabled {
+  cursor: default;
+}
+.btn-block {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px;
+  font-size: 1.05rem;
+}
+.btn-primary {
+  background: var(--gold);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--gold-dark);
+}
+.btn-secondary {
+  background: #6b5b3a;
+  color: #fff;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+.btn-added {
+  background: #e8f0e2;
+  color: var(--green);
+}
+
+/* ---------- Picker ---------- */
+.search-card {
+  padding: 12px;
+  margin-bottom: 14px;
+}
+.search-input {
+  font-size: 1.05rem;
+}
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.preview-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--muted);
+}
+.preview-hint {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.preview-hint.too-many {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+}
+.preview-subhint {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+}
+
+/* ---------- Beer cards ---------- */
+.beer-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+.beer-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: 0 0 auto;
+  background: #f3e6c4;
+}
+.beer-thumb.small {
+  width: 48px;
+  height: 48px;
+}
+.beer-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.beer-name {
+  display: block;
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.beer-brewery {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.beer-meta {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* ---------- Floating buttons ---------- */
+.floating {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  box-shadow: 0 4px 14px rgba(60, 45, 10, 0.28);
+  max-width: 520px;
+  width: calc(100% - 32px);
+}
+.floating-top {
+  top: 12px;
+}
+.floating-bottom {
+  bottom: 16px;
+}
+.btn-vote {
+  background: var(--green);
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 13px;
+  letter-spacing: 0.03em;
+}
+.btn-cast {
+  background: var(--amber);
+  color: #2c2417;
+  font-size: 1.1rem;
+  padding: 14px;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Ballot ---------- */
+.ballot {
+  position: relative;
+  padding-top: 60px;
+}
+.ballot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ballot-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  touch-action: manipulation;
+}
+.rank-badge {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* Central body: fills the space between the up/down buttons and is itself the
+   drag handle, holding the logo, name, description, and drag icon. */
+.drag-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffdf8;
+  cursor: grab;
+  touch-action: none;
+}
+.drag-body:active {
+  cursor: grabbing;
+}
+.drag-body:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+.drag-body .rank-badge {
+  margin: 0;
+}
+.drag-icon {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+/* Ballot text: brewery is emphasized (votes are counted by brewery), the beer
+   line is the secondary detail — the swapped emphasis vs. the picker cards. */
+.ballot-brewery {
+  display: block;
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ballot-beer {
+  display: block;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.remove-btn {
+  color: var(--red);
+  border-color: #eccfc9;
+}
+.cast-banner {
+  text-align: center;
+  background: #e8f0e2;
+  color: var(--green);
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 0 0 12px;
+}
+.ballot-cast .ballot-card {
+  opacity: 0.6;
+}
+/* Ranks beyond the participating-brewery cutoff: slightly greyed, no ordinal. */
+.ballot-card.beyond-cutoff {
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
+.rank-badge-muted {
+  background: var(--muted);
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 22, 6, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 40;
+}
+.modal {
+  width: 100%;
+  max-width: 380px;
+}
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+.modal-message {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}

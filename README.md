@@ -61,11 +61,24 @@ npm start
 .
 ├── app.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
-├── frontend/              # React.js frontend
-│   ├── src/
-│   └── package.json
-└── tests/                 # Test suite
+├── frontend/              # React.js frontend (Vite)
+│   ├── index.html
+│   ├── package.json
+│   └── src/
+│       ├── main.jsx       # App entry (Router + AppProvider)
+│       ├── App.jsx        # Routes: /register, /login, /app
+│       ├── styles.css
+│       ├── data/          # beers.js fixture (mock beer data)
+│       ├── lib/           # session.js (localStorage mock session cookie)
+│       ├── context/       # AppContext.jsx (useReducer store)
+│       └── components/     # RegistrationForm, BeerPicker, Ballot, …
+└── docs/stories/          # Story backlog / in-progress / delivered
 ```
+
+> The favorite-beer voting UI (`docs/stories/02-*`) is currently a **client-side
+> mock**: beer data comes from a fixture and session/ballot state persists in
+> `localStorage`. Real backend integration is tracked in
+> `docs/stories/backlog/03-beer_backend_and_integration.md`.
 
 ## Contributing
 

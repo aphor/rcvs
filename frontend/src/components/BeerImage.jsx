@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { beerImageUrl } from '../data/beers.js'
+import { getBeerImage } from '../lib/beerImages.js'
 
-// A local inline SVG shown when the network placeholder image fails to load,
-// so the mock renders fully offline.
+// A local inline SVG shown when a beer has no label or brewery logo (or the
+// image fails to load), so the mock always renders something.
 const FALLBACK =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
@@ -15,7 +15,7 @@ const FALLBACK =
   )
 
 export default function BeerImage({ beer, className }) {
-  const [src, setSrc] = useState(beerImageUrl(beer.id))
+  const [src, setSrc] = useState(getBeerImage(beer) || FALLBACK)
   return (
     <img
       className={className}

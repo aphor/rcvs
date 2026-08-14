@@ -7,8 +7,9 @@
 // releases per brewery, not an exhaustive live tap list. In the real app
 // (backlog/03) this is replaced by a GET /api/beers?q= search endpoint.
 //
-// Each beer: { id, name, brewery, style, abv }
-// imageUrl is derived deterministically from the id (see beerImageUrl).
+// Each beer: { id, name, brewery, style, abv, brewerySlug }
+// Imagery (real label art + brewery logos) is resolved from local bundled
+// assets in src/lib/beerImages.js, keyed by id (label) then brewerySlug (logo).
 //
 // Off Hours Beer Co. is sourced from its July 2026 draft-beer menu PDF
 // (guest taps from other breweries excluded).
@@ -381,11 +382,8 @@ export const beers = RAW.map(([name, brewery, style, abv], i) => ({
   brewery,
   style,
   abv,
+  brewerySlug: slug(brewery),
 }))
-
-// Deterministic placeholder image for a beer id. picsum.photos returns a stable
-// image per seed; components fall back to a local SVG if the network image fails.
-export const beerImageUrl = (id) => `https://picsum.photos/seed/${id}/240/240`
 
 const byId = new Map(beers.map((b) => [b.id, b]))
 export const getBeer = (id) => byId.get(id)

@@ -45,6 +45,14 @@ function reducer(state, action) {
       if (state.ballotCast) return state
       return { ...state, ballot: action.ballot }
 
+    case 'SET_FLAVOR_RANKS': // whole grid-ballot state, already constraint-checked
+      if (state.ballotCast) return state
+      return { ...state, flavorRanks: action.ranks }
+
+    case 'SET_FEEDBACK':
+      if (state.ballotCast) return state
+      return { ...state, feedback: action.feedback }
+
     case 'CAST_BALLOT':
       if (state.ballot.length === 0) return state
       return { ...state, ballotCast: true }
@@ -73,6 +81,8 @@ export function AppProvider({ children }) {
       promote: (id) => dispatch({ type: 'PROMOTE', id }),
       demote: (id) => dispatch({ type: 'DEMOTE', id }),
       reorder: (ballot) => dispatch({ type: 'REORDER', ballot }),
+      setFlavorRanks: (ranks) => dispatch({ type: 'SET_FLAVOR_RANKS', ranks }),
+      setFeedback: (feedback) => dispatch({ type: 'SET_FEEDBACK', feedback }),
       castBallot: () => dispatch({ type: 'CAST_BALLOT' }),
       reset: () => {
         clearSession()

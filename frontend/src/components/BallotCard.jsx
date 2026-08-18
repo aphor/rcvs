@@ -65,7 +65,10 @@ export default function BallotCard({
         </span>
         <BeerImage beer={beer} className="beer-thumb small" />
         <span className="beer-info">
-          <span className="ballot-brewery">{beer.brewery}</span>
+          <span className="ballot-line1">
+            <span className="ballot-brewery">{beer.brewery}</span>
+            <span className={`flavor-pill flavor-${beer.flavor.toLowerCase()}`}>{beer.flavor}</span>
+          </span>
           <span className="ballot-beer">
             {beer.name} · {beer.style} · {beer.abv.toFixed(1)}% ABV
           </span>

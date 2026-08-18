@@ -17,14 +17,33 @@ import {
 import { useApp } from '../context/AppContext.jsx'
 import { getBeer, breweryCount } from '../data/beers.js'
 import BallotCard from './BallotCard.jsx'
+import FlavorBallot from './FlavorBallot.jsx'
+import FeedbackCard from './FeedbackCard.jsx'
 import ConfirmModal from './ConfirmModal.jsx'
 
+// The ballot is a small pager of cards; the cast button unlocks only once every
+// card has been viewed.
+const CARDS = [
+  { key: 'beers', title: 'Rank your beers' },
+  { key: 'flavors', title: 'Rank flavor profiles' },
+  { key: 'feedback', title: 'Questions & suggestions' },
+]
+
 export default function Ballot({ onBrowse }) {
-  const { state, promote, demote, removeBeer, reorder, castBallot } = useApp()
+  const { state, promote, demote, removeBeer, reorder, setFlavorRanks, setFeedback, castBallot } =
+    useApp()
   const cast = state.ballotCast
 
-  // modal is null | { type: 'remove', id } | { type: 'cast' }
-  const [modal, setModal] = useState(null)
+  const [card, setCard] = useState(0)
+  const [viewed, setViewed] = useState(() => new Set([0]))
+  const [modal, setModal] = useState(null) // null | { type: 'remove', id } | { type: 'cast' }
+
+  const go = (index) => {
+    if (index < 0 || index >= CARDS.length) return
+    setCard(index)
+    setViewed((prev) => (prev.has(index) ? prev : new Set(prev).add(index)))
+  }
+  const allViewed = viewed.size === CARDS.length
 
   // Touch needs a short press delay so vertical scrolling still works; pointer
   // (mouse) needs a small distance threshold so clicks aren't read as drags.
@@ -52,47 +71,84 @@ export default function Ballot({ onBrowse }) {
 
   return (
     <div className={cast ? 'ballot ballot-cast' : 'ballot'}>
-      <button type="button" className="floating floating-top btn btn-secondary" onClick={onBrowse}>
-        {cast ? 'BROWSE BEERS' : '← ADD MORE BEERS TO BALLOT'}
-      </button>
+      <div className="ballot-progress floating floating-top">
+        Card {card + 1} of {CARDS.length}: {CARDS[card].title}
+      </div>
 
       <div className="ballot-body">
         {cast && <p className="cast-banner">✓ Ballot cast — thanks for voting!</p>}
 
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={state.ballot} strategy={verticalListSortingStrategy}>
-            <div className="ballot-list">
-              {state.ballot.map((id, i) => {
-                const beer = getBeer(id)
-                if (!beer) return null
-                return (
-                  <BallotCard
-                    key={id}
-                    beer={beer}
-                    rank={i + 1}
-                    total={state.ballot.length}
-                    cutoff={breweryCount}
-                    disabled={cast}
-                    onPromote={() => promote(id)}
-                    onDemote={() => demote(id)}
-                    onRemove={() => setModal({ type: 'remove', id })}
-                  />
-                )
-              })}
-            </div>
-          </SortableContext>
-        </DndContext>
+        {card === 0 && (
+          <>
+            <button type="button" className="btn btn-secondary browse-btn" onClick={onBrowse}>
+              {cast ? 'BROWSE BEERS' : '← ADD MORE BEERS TO BALLOT'}
+            </button>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+              <SortableContext items={state.ballot} strategy={verticalListSortingStrategy}>
+                <div className="ballot-list">
+                  {state.ballot.map((id, i) => {
+                    const beer = getBeer(id)
+                    if (!beer) return null
+                    return (
+                      <BallotCard
+                        key={id}
+                        beer={beer}
+                        rank={i + 1}
+                        total={state.ballot.length}
+                        cutoff={breweryCount}
+                        disabled={cast}
+                        onPromote={() => promote(id)}
+                        onDemote={() => demote(id)}
+                        onRemove={() => setModal({ type: 'remove', id })}
+                      />
+                    )
+                  })}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </>
+        )}
+
+        {card === 1 && (
+          <FlavorBallot ranks={state.flavorRanks} onChange={setFlavorRanks} disabled={cast} />
+        )}
+
+        {card === 2 && (
+          <FeedbackCard feedback={state.feedback} onChange={setFeedback} disabled={cast} />
+        )}
+
+        {!cast && !allViewed && (
+          <p className="cast-hint">Preview all ballot cards to enable casting.</p>
+        )}
       </div>
 
-      {!cast && (
+      <div className="ballot-nav floating floating-bottom">
         <button
           type="button"
-          className="floating floating-bottom btn btn-cast"
+          className="btn btn-ghost nav-btn"
+          onClick={() => go(card - 1)}
+          disabled={card === 0}
+        >
+          ‹ Prev
+        </button>
+        <button
+          type="button"
+          className="btn btn-cast"
           onClick={() => setModal({ type: 'cast' })}
+          disabled={cast || !allViewed}
+          title={!allViewed ? 'Preview all ballot cards first' : undefined}
         >
           CAST BALLOT
         </button>
-      )}
+        <button
+          type="button"
+          className="btn btn-ghost nav-btn"
+          onClick={() => go(card + 1)}
+          disabled={card === CARDS.length - 1}
+        >
+          Next ›
+        </button>
+      </div>
 
       <ConfirmModal
         open={modal?.type === 'remove'}
@@ -106,7 +162,7 @@ export default function Ballot({ onBrowse }) {
       <ConfirmModal
         open={modal?.type === 'cast'}
         title="Cast your ballot?"
-        message="Once cast, your ranking is final and can't be changed."
+        message="Once cast, your rankings are final and can't be changed."
         confirmLabel="Cast ballot"
         onConfirm={confirmModal}
         onCancel={() => setModal(null)}

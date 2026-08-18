@@ -10,6 +10,8 @@ const SESSION_KEY = 'rcvs_session'
 export const emptySession = () => ({
   user: null, // { firstname, lastname, mobile, phone, email }
   ballot: [], // ordered list of beer ids; index 0 === rank 1 (top of ballot)
+  flavorRanks: {}, // { [flavor]: rankNumber } — grid ballot, one flavor per rank
+  feedback: { text: '', contactMe: false }, // questions/suggestions card
   ballotCast: false,
 })
 

@@ -361,6 +361,51 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Brewery name + flavor pill share the top line; brewery truncates, pill holds. */
+.ballot-line1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.ballot-line1 .ballot-brewery {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.flavor-pill {
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.5;
+}
+.flavor-hoppy {
+  background: #e2efd9;
+  color: #3f7d3f;
+}
+.flavor-malty {
+  background: #ecdcc4;
+  color: #8a5a2b;
+}
+.flavor-fruity {
+  background: #f7dced;
+  color: #b13a7a;
+}
+.flavor-sour {
+  background: #eef3c0;
+  color: #7d8a1f;
+}
+.flavor-crisp {
+  background: #d9ecf2;
+  color: #2b6c8a;
+}
+.flavor-exotic {
+  background: #e6dcf2;
+  color: #6b3fa0;
+}
 .remove-btn {
   color: var(--red);
   border-color: #eccfc9;
@@ -413,4 +458,122 @@ body {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+/* ---------- Ballot pager: progress header + bottom nav ---------- */
+.ballot-progress {
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gold-dark);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px;
+}
+.browse-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.ballot-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ballot-nav .nav-btn {
+  flex: 0 0 auto;
+  background: var(--surface);
+}
+.ballot-nav .btn-cast {
+  flex: 1 1 auto;
+}
+.ballot-nav .btn:disabled {
+  opacity: 0.5;
+}
+.cast-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 14px 0 0;
+}
+
+/* ---------- Flavor grid ballot (paper-style RCV grid) ---------- */
+.flavor-ballot-instructions {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+.grid-scroll {
+  overflow-x: auto;
+}
+.flavor-grid {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.flavor-grid th,
+.flavor-grid td {
+  padding: 9px 4px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+.flavor-grid thead th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--bg);
+}
+.flavor-grid tbody tr:last-child th,
+.flavor-grid tbody tr:last-child td {
+  border-bottom: none;
+}
+.flavor-row-label {
+  text-align: left;
+  padding-left: 10px;
+}
+.grid-radio {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.grid-radio:disabled {
+  cursor: default;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Feedback card ---------- */
+.feedback-text {
+  resize: vertical;
+  min-height: 130px;
+  font-family: inherit;
+}
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.checkbox-row input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--gold);
 }

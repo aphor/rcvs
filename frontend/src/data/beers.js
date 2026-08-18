@@ -376,14 +376,130 @@ const slug = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
-export const beers = RAW.map(([name, brewery, style, abv], i) => ({
-  id: `beer-${String(i + 1).padStart(3, '0')}-${slug(name)}`,
-  name,
-  brewery,
-  style,
-  abv,
-  brewerySlug: slug(brewery),
-}))
+// Six approachable flavor categories for browsing/filtering. Each beer is
+// classified by its `style` (see STYLE_FLAVOR), so all beers of a style share a
+// flavor. Assignments were reviewed with the festival organizer.
+export const FLAVORS = ['Hoppy', 'Malty', 'Fruity', 'Sour', 'Crisp', 'Exotic']
+
+const STYLE_FLAVOR = {
+  // Hoppy — the IPA / Pale Ale family (hazy IPAs included)
+  'IPA - American': 'Hoppy',
+  'IPA - New England / Hazy': 'Hoppy',
+  'IPA - Double New England / Hazy': 'Hoppy',
+  'IPA - Imperial / Double': 'Hoppy',
+  'IPA - Cold': 'Hoppy',
+  'IPA - Session': 'Hoppy',
+  'IPA - Wheat': 'Hoppy',
+  'Pale Ale - American': 'Hoppy',
+  'Pale Ale - New England / Hazy': 'Hoppy',
+  'Pale Ale - XPA': 'Hoppy',
+  'Pale Ale - New Zealand': 'Hoppy',
+  'Non-Alcoholic IPA': 'Hoppy',
+  'Non-Alcoholic Pale Ale': 'Hoppy',
+
+  // Malty — browns, reds, porters, most stouts, bocks, dark/amber lagers
+  'Brown Ale - American': 'Malty',
+  'Brown Ale - English': 'Malty',
+  'Red Ale': 'Malty',
+  'Red Ale - Amber': 'Malty',
+  'Red Ale - Irish': 'Malty',
+  Porter: 'Malty',
+  'Porter - American': 'Malty',
+  'Porter - Baltic': 'Malty',
+  'Porter - English': 'Malty',
+  'Porter - Imperial': 'Malty',
+  'Stout - American': 'Malty',
+  'Stout - Oatmeal': 'Malty',
+  'Stout - Imperial': 'Malty',
+  'Stout - Imperial Oatmeal': 'Malty',
+  'Stout - Irish Dry': 'Malty',
+  'Stout - Milk / Sweet': 'Malty',
+  'Stout - Russian Imperial': 'Malty',
+  'Stout - Other': 'Malty',
+  'Bock - Doppelbock': 'Malty',
+  Märzen: 'Malty',
+  'Lager - Märzen': 'Malty',
+  'Lager - Vienna': 'Malty',
+  'Lager - Amber': 'Malty',
+  'Lager - Dark': 'Malty',
+  'Lager - Munich Dunkel': 'Malty',
+  Altbier: 'Malty',
+  'Bitter - Session': 'Malty',
+  'Bitter - ESB': 'Malty',
+  Mild: 'Malty',
+  'Scotch Ale / Wee Heavy': 'Malty',
+  'California Common': 'Malty',
+  'Belgian Dubbel': 'Malty',
+
+  // Crisp — pilsners, kölsch, cream/blonde ales, pale & light lagers
+  Kölsch: 'Crisp',
+  Pilsner: 'Crisp',
+  'Pilsner - German': 'Crisp',
+  'Pilsner - Czech': 'Crisp',
+  'Pilsner - Italian': 'Crisp',
+  'Lager - Pilsner': 'Crisp',
+  'Cream Ale': 'Crisp',
+  'Blonde / Golden Ale': 'Crisp',
+  'Belgian Blonde': 'Crisp',
+  'Lager - Helles': 'Crisp',
+  'Lager - American': 'Crisp',
+  'Lager - American Light': 'Crisp',
+  'Lager - Mexican': 'Crisp',
+  'Lager - Pale': 'Crisp',
+  'Lager - Dortmunder / Export': 'Crisp',
+  'Lager - Rice': 'Crisp',
+  'Summer Ale': 'Crisp',
+  'Non-Alcoholic Lager': 'Crisp',
+  'Non-Alcoholic Festbier': 'Crisp',
+  'Cider - Traditional': 'Crisp',
+
+  // Fruity — all wheat ales, milkshake IPAs, estery Belgians, fruit cider
+  'Wheat Beer - Hefeweizen': 'Fruity',
+  'Wheat Beer - Witbier': 'Fruity',
+  'Wheat Beer - American Pale': 'Fruity',
+  'IPA - Milkshake': 'Fruity',
+  'IPA - Double Milkshake': 'Fruity',
+  'Belgian Tripel': 'Fruity',
+  'Pale Ale - Belgian': 'Fruity',
+  'Cider - Fruit': 'Fruity',
+
+  // Sour
+  'Sour - Gose': 'Sour',
+  'Sour - Berliner Weisse': 'Sour',
+  'Sour - Catharina': 'Sour',
+  'Sour - Dragonfruit': 'Sour',
+  'Sour - Fruited': 'Sour',
+  'Sour Ale': 'Sour',
+  'Non-Alcoholic Sour': 'Sour',
+
+  // Exotic — farmhouse, historical, rye, Belgian IPA, adjunct stouts
+  'Farmhouse Ale - Saison': 'Exotic',
+  'Farmhouse Ale - Grisette': 'Exotic',
+  'Historical - Kottbusser': 'Exotic',
+  'Rye Beer': 'Exotic',
+  'IPA - Belgian': 'Exotic',
+  'Stout - Coffee': 'Exotic',
+  'Stout - Pastry': 'Exotic',
+  'Stout - Imperial Pastry': 'Exotic',
+  'Stout - Spiced': 'Exotic',
+}
+
+export const beers = RAW.map(([name, brewery, style, abv], i) => {
+  const flavor = STYLE_FLAVOR[style]
+  if (!flavor) {
+    // Guard: a newly scraped style must be classified, never silently dropped.
+    throw new Error(`Unclassified beer style: "${style}" (${name}). Add it to STYLE_FLAVOR.`)
+  }
+  return {
+    id: `beer-${String(i + 1).padStart(3, '0')}-${slug(name)}`,
+    name,
+    brewery,
+    style,
+    flavor,
+    abv,
+    brewerySlug: slug(brewery),
+  }
+})
 
 const byId = new Map(beers.map((b) => [b.id, b]))
 export const getBeer = (id) => byId.get(id)

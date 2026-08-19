@@ -20,7 +20,7 @@ const INTRO = [
           reflect your preference from top to bottom.
         </p>
         <p>
-          With dozens of breweries pouring, beer rnakings will be counted <strong>by brewery</strong>
+          With dozens of breweries pouring, beer rankings will be counted <strong>by brewery</strong>
           so that everyone's choices taken together clearly indicate a winner.
         </p>
         <p>

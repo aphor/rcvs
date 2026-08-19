@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useApp } from './context/AppContext.jsx'
-import RegistrationForm from './components/RegistrationForm.jsx'
+import Welcome from './components/Welcome.jsx'
 import VotingApp from './components/VotingApp.jsx'
 
 export default function App() {
@@ -11,7 +11,7 @@ export default function App() {
     <Routes>
       <Route
         path="/register"
-        element={registered ? <Navigate to="/app" replace /> : <RegistrationForm />}
+        element={registered ? <Navigate to="/app" replace /> : <Welcome />}
       />
       {/* Login is a stub for the mock: registration creates the session. */}
       <Route path="/login" element={<Navigate to="/register" replace />} />

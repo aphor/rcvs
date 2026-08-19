@@ -510,14 +510,43 @@ export const getBeer = (id) => byId.get(id)
 export const breweries = [...new Set(beers.map((b) => b.brewery))]
 export const breweryCount = breweries.length
 
-// Case-insensitive match on name, brewery, and style.
+// Case-insensitive relevance search over name, brewery, and style. Results are
+// returned best-match-first in three tiers, each beer appearing once in its
+// strongest tier:
+//   1. whole-query substring match (the typed string appears verbatim)
+//   2. conjunction — every query word appears (AND), for multi-word queries
+//   3. disjunction — any query word appears (OR)
+// Within a tier the original fixture order is preserved.
 export function searchBeers(query) {
   const q = query.trim().toLowerCase()
   if (!q) return beers
-  return beers.filter(
-    (b) =>
-      b.name.toLowerCase().includes(q) ||
-      b.brewery.toLowerCase().includes(q) ||
-      b.style.toLowerCase().includes(q)
-  )
+  const words = q.split(/\s+/).filter(Boolean)
+
+  const substring = []
+  const conjunction = []
+  const disjunction = []
+
+  for (const b of beers) {
+    const hay = `${b.name} ${b.brewery} ${b.style}`.toLowerCase()
+    if (hay.includes(q)) {
+      substring.push(b)
+    } else if (words.length > 1 && words.every((w) => hay.includes(w))) {
+      conjunction.push(b)
+    } else if (words.some((w) => hay.includes(w))) {
+      disjunction.push(b)
+    }
+  }
+
+  return [...substring, ...conjunction, ...disjunction]
+}
+
+// A random sample of `n` beers in random order (Fisher-Yates). Used to seed the
+// picker with suggestions before the taster has typed anything.
+export function randomBeers(n) {
+  const pool = beers.slice()
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  return pool.slice(0, n)
 }

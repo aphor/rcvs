@@ -56,7 +56,7 @@ export default function RegistrationForm() {
     <div className="screen">
       <header className="app-header">
         <h1>🍺 Favorite Beer Vote</h1>
-        <p className="subtitle">Zero Waste Microbrew Beer Festival</p>
+        <p className="subtitle">Oak Park Microbrew Review 2026</p>
       </header>
 
       <form className="card form" onSubmit={onSubmit} noValidate>
@@ -79,6 +79,7 @@ export default function RegistrationForm() {
           Start tasting
         </button>
       </form>
+      <p>* Please leave valid contact information if you would like FairVote to contact you about questions or suggestions. Otherwise, fill in this form at your discretion.</p>
     </div>
   )
 }

@@ -1,13 +1,23 @@
-import { useMemo, useState } from 'react'
-import { searchBeers } from '../data/beers.js'
+import { useEffect, useMemo, useState } from 'react'
+import { searchBeers, randomBeers } from '../data/beers.js'
 import BeerPreview from './BeerPreview.jsx'
 
 const MAX_RESULTS = 10
 
 export default function BeerPicker() {
   const [query, setQuery] = useState('')
+  const isEmpty = query.trim() === ''
 
-  const matches = useMemo(() => (query.trim() ? searchBeers(query) : []), [query])
+  // Suggestions shown while the box is empty; re-rolled each time it empties.
+  const [suggestions, setSuggestions] = useState(() => randomBeers(MAX_RESULTS))
+  useEffect(() => {
+    if (isEmpty) setSuggestions(randomBeers(MAX_RESULTS))
+  }, [isEmpty])
+
+  const matches = useMemo(
+    () => (isEmpty ? suggestions : searchBeers(query)),
+    [isEmpty, query, suggestions]
+  )
 
   return (
     <div className="picker">

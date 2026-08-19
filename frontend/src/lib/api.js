@@ -5,7 +5,7 @@
 // The ballot-box (anonymous rankings) and receipt (PII + comments) are two
 // independent submissions to two services that share no key.
 
-const BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:5000'
+const BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:5055'
 
 async function post(path, body) {
   const res = await fetch(BASE + path, {

@@ -308,15 +308,19 @@ class Configurable:
     
     def _wrap_class(self):
         """Wrap the decorated class to add configuration functionality."""
-        
+
+        # Capture the original init in the closure — it lives on the decorator,
+        # not on the instances of the wrapped class.
+        original_init = self.original_init
+
         # Create a new class that inherits from the original
         class ConfigurableClass(self.cls):
-            def __init__(self, *args, **kwargs):
+            def __init__(instance, *args, **kwargs):
                 # Call the original __init__
-                self.original_init(*args, **kwargs)
-                
+                original_init(instance, *args, **kwargs)
+
                 # Initialize configuration
-                self.configuration = Configuration(self.defaultConfiguration())
+                instance.configuration = Configuration(instance.defaultConfiguration())
         
         # Replace the original class with the wrapped one
         self.cls = ConfigurableClass

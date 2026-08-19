@@ -11,6 +11,7 @@ No identifier is shared between them, so identity can't be joined to votes.
 """
 
 import os
+import secrets
 
 from flask import Flask
 from flask_cors import CORS
@@ -24,7 +25,9 @@ def create_app(
 ):
     """Create and configure the Flask application and its two stores."""
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "your-secret-key-here"
+    # Set RCVS_SECRET_KEY in the environment for a stable key across restarts
+    # and workers; without it each process gets its own ephemeral key.
+    app.config["SECRET_KEY"] = os.environ.get("RCVS_SECRET_KEY") or secrets.token_hex(32)
     CORS(app)
 
     from backend.models import SqlitePersistence

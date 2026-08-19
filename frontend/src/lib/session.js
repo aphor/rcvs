@@ -13,6 +13,7 @@ export const emptySession = () => ({
   flavorRanks: {}, // { [flavor]: rankNumber } — grid ballot, one flavor per rank
   feedback: { text: '', contactMe: false }, // questions/suggestions card
   ballotCast: false,
+  receipt: null, // ballot-box signature returned on cast (best-effort)
 })
 
 export function loadSession() {

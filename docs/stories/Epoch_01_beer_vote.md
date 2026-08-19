@@ -1,4 +1,4 @@
-# Zero Waste Microbrew Beer Festival Favorite Beer Voting
+# Oak Park Microbrew Review Festival Favorite Beer Voting
 
 ## In Progress:
   * 02-favorite_beer_frontend_mock.md (epic)

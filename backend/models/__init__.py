@@ -7,6 +7,7 @@ from .candidate import Candidate
 from .election import Election
 from .ballot import Ballot, BallotStatus
 from .voter import Voter
+from .receipt import Receipt
 from .persistent import Persistent, PersistenceState
 from .persistence_interface import PersistenceInterface
 from .sqlite_persistence import SqlitePersistence
@@ -19,6 +20,7 @@ __all__ = [
     "Ballot",
     "BallotStatus",
     "Voter",
+    "Receipt",
     "Persistent",
     "PersistenceState",
     "PersistenceInterface",

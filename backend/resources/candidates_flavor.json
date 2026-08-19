@@ -1,0 +1,38 @@
+[
+  {
+    "id": "hoppy",
+    "contest_id": "favorite-flavor",
+    "name": "Hoppy",
+    "description": ""
+  },
+  {
+    "id": "malty",
+    "contest_id": "favorite-flavor",
+    "name": "Malty",
+    "description": ""
+  },
+  {
+    "id": "fruity",
+    "contest_id": "favorite-flavor",
+    "name": "Fruity",
+    "description": ""
+  },
+  {
+    "id": "sour",
+    "contest_id": "favorite-flavor",
+    "name": "Sour",
+    "description": ""
+  },
+  {
+    "id": "crisp",
+    "contest_id": "favorite-flavor",
+    "name": "Crisp",
+    "description": ""
+  },
+  {
+    "id": "exotic",
+    "contest_id": "favorite-flavor",
+    "name": "Exotic",
+    "description": ""
+  }
+]

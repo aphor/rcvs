@@ -7,6 +7,7 @@ from .candidate import Candidate
 from .election import Election
 from .ballot import Ballot
 from .voter import Voter
+from .receipt import Receipt
 from .persistent import Persistent
 
 
@@ -22,7 +23,10 @@ class SqlitePersistence(PersistenceInterface):
         self._ensure_database_initialized()
 
     def _ensure_database_initialized(self):
-        self.connection = sqlite3.connect(self.db_path)
+        # check_same_thread=False so the single shared connection can serve the
+        # Flask dev server's worker threads. (Writes are still serialized by
+        # SQLite's file lock; adequate for festival scale.)
+        self.connection = sqlite3.connect(self.db_path, check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
         self._create_tables()
 
@@ -30,7 +34,7 @@ class SqlitePersistence(PersistenceInterface):
         return model_class.__name__.lower() + "s"
 
     def _create_tables(self):
-        models = [Election, Contest, Candidate, Ballot, Voter]
+        models = [Election, Contest, Candidate, Ballot, Voter, Receipt]
         for model in models:
             table_name = self._get_model_table_name(model)
             self._create_table(table_name)
@@ -52,6 +56,7 @@ class SqlitePersistence(PersistenceInterface):
             "candidate": "candidates",
             "ballot": "ballots",
             "voter": "voters",
+            "receipt": "receipts",
         }
         return type_map.get(model_type.lower(), model_type.lower() + "s")
 
@@ -105,6 +110,18 @@ class SqlitePersistence(PersistenceInterface):
         except Exception as e:
             print(f"Error loading data from SQLite: {e}")
             return {}
+
+    def load_all(self, model_type: str) -> "list[Dict[str, Any]]":
+        """Load every record of a model type. The JSON-blob schema has no
+        queryable columns, so callers filter in Python."""
+        try:
+            table_name = self._table_name_for_type(model_type)
+            cursor = self.connection.cursor()
+            cursor.execute(f"SELECT data FROM {table_name}")
+            return [json.loads(row["data"]) for row in cursor.fetchall()]
+        except Exception as e:
+            print(f"Error loading all data from SQLite: {e}")
+            return []
 
     def delete(self, model_type: str, identifier: str) -> bool:
         try:

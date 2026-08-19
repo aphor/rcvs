@@ -1,0 +1,14 @@
+[
+  {
+    "id": "favorite-brewery",
+    "name": "Favorite Brewery",
+    "election_id": "opmr-2026",
+    "description": "Voters rank the beers they tasted; rankings are counted by brewery (a brewery's rank is its highest-ranked beer)."
+  },
+  {
+    "id": "favorite-flavor",
+    "name": "Favorite Flavor Profile",
+    "election_id": "opmr-2026",
+    "description": "Voters rank broad flavor profiles on a grid ballot."
+  }
+]

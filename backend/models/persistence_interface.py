@@ -10,6 +10,9 @@ class PersistenceInterface:
     def load(self, model_type: str, record_id: str) -> Dict[str, Any]:
         raise NotImplementedError("load method must be implemented by subclasses")
 
+    def load_all(self, model_type: str) -> "list[Dict[str, Any]]":
+        raise NotImplementedError("load_all method must be implemented by subclasses")
+
     def delete(self, model_type: str, identifier: str) -> bool:
         raise NotImplementedError("delete method must be implemented by subclasses")
 

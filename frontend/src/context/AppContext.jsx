@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react'
 import { loadSession, saveSession, clearSession, emptySession } from '../lib/session.js'
+import { submitCastBallot } from '../lib/api.js'
 
 const AppContext = createContext(null)
 
@@ -57,6 +58,9 @@ function reducer(state, action) {
       if (state.ballot.length === 0) return state
       return { ...state, ballotCast: true }
 
+    case 'SET_RECEIPT': // ballot-box signature, arrives async after cast
+      return { ...state, receipt: action.receipt }
+
     case 'RESET':
       return emptySession()
 
@@ -83,7 +87,14 @@ export function AppProvider({ children }) {
       reorder: (ballot) => dispatch({ type: 'REORDER', ballot }),
       setFlavorRanks: (ranks) => dispatch({ type: 'SET_FLAVOR_RANKS', ranks }),
       setFeedback: (feedback) => dispatch({ type: 'SET_FEEDBACK', feedback }),
-      castBallot: () => dispatch({ type: 'CAST_BALLOT' }),
+      castBallot: () => {
+        if (state.ballot.length === 0) return
+        dispatch({ type: 'CAST_BALLOT' })
+        // Best-effort backend submit; the offline mock works regardless.
+        submitCastBallot(state).then((receipt) => {
+          if (receipt) dispatch({ type: 'SET_RECEIPT', receipt })
+        })
+      },
       reset: () => {
         clearSession()
         dispatch({ type: 'RESET' })

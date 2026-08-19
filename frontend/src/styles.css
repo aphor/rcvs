@@ -116,6 +116,11 @@ body {
 .input-error {
   border-color: var(--red);
 }
+.form-hint {
+  margin: -4px 0 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
 .field-error {
   display: block;
   color: var(--red);

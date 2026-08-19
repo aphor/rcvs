@@ -13,11 +13,11 @@ const FIELDS = [
 const emptyForm = () =>
   FIELDS.reduce((acc, f) => ({ ...acc, [f.name]: '' }), {})
 
+// Every contact detail is optional — the only rule is that an email, if given,
+// has to look like one. Submitting the form empty is allowed; the backend then
+// stands the requesting address in for a name.
 function validate(values) {
   const errors = {}
-  for (const f of FIELDS) {
-    if (!values[f.name].trim()) errors[f.name] = 'Required'
-  }
   if (values.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
     errors.email = 'Enter a valid email'
   }
@@ -61,6 +61,7 @@ export default function RegistrationForm() {
 
       <form className="card form" onSubmit={onSubmit} noValidate>
         <h2>Register to taste &amp; vote</h2>
+        <p className="form-hint">All fields are optional.</p>
         {FIELDS.map((f) => (
           <label key={f.name} className="field">
             <span className="field-label">{f.label}</span>

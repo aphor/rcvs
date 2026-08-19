@@ -9,6 +9,21 @@ from flask import Blueprint, request, jsonify
 
 from backend.models import Receipt
 
+# The registration form's contact fields, all optional.
+_CONTACT_FIELDS = ("firstname", "lastname", "mobile", "phone", "email")
+
+
+def client_ip() -> str:
+    """The address our own proxy saw the request come from.
+
+    lighttpd appends its view of the peer to any X-Forwarded-For the visitor
+    sent, so the rightmost entry is the only one a visitor cannot forge.
+    """
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if forwarded.strip():
+        return forwarded.split(",")[-1].strip()
+    return request.remote_addr or ""
+
 
 def create_blueprint(store) -> Blueprint:
     bp = Blueprint("receipts", __name__)
@@ -19,13 +34,20 @@ def create_blueprint(store) -> Blueprint:
         user = body.get("user") or {}
         feedback = body.get("feedback") or {}
 
+        contact = {f: str(user.get(f) or "").strip() for f in _CONTACT_FIELDS}
+        # Every contact field is optional. With none of them filled in there is
+        # nothing to follow up on, so stand the requesting address in for a name
+        # rather than filing an entirely blank receipt.
+        if not any(contact.values()):
+            contact["firstname"] = client_ip()
+
         receipt = Receipt(
             id=str(uuid4()),
-            firstname=user.get("firstname", ""),
-            lastname=user.get("lastname", ""),
-            mobile=user.get("mobile", ""),
-            phone=user.get("phone", ""),
-            email=user.get("email", ""),
+            firstname=contact["firstname"],
+            lastname=contact["lastname"],
+            mobile=contact["mobile"],
+            phone=contact["phone"],
+            email=contact["email"],
             comments=feedback.get("text", ""),
             contact_me=bool(feedback.get("contactMe", False)),
         )

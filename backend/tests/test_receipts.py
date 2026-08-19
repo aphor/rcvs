@@ -28,6 +28,7 @@ def test_receipt_stored_separately_from_votes(client, app):
 
 
 def test_full_cast_keeps_identity_and_votes_apart(client, app):
+    app.polls.open()
     beers = list(app.resources.beer_brewery_map.keys())
     client.post("/api/ballot", json={"ballot": [beers[0]], "flavorRanks": {}})
     client.post(

@@ -31,11 +31,18 @@ def flavor_ranking(flavor_ranks: Dict[str, int], resources) -> List[str]:
     return [resources.flavor_candidate_id(flavor) for flavor, _ in ordered]
 
 
-def create_blueprint(store, resources) -> Blueprint:
+def create_blueprint(store, resources, polls) -> Blueprint:
     bp = Blueprint("ballotbox", __name__)
 
     @bp.route("/api/ballot", methods=["POST"])
     def cast():
+        if not polls.is_open():
+            return (
+                jsonify(
+                    {"error": "polls_not_open", "message": "Polls are not open for voting."}
+                ),
+                403,
+            )
         body = request.get_json(force=True, silent=True) or {}
         brewery = brewery_ranking(body.get("ballot", []) or [], resources)
         flavor = flavor_ranking(body.get("flavorRanks", {}) or {}, resources)

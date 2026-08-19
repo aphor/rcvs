@@ -2,6 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useApp } from './context/AppContext.jsx'
 import Welcome from './components/Welcome.jsx'
 import VotingApp from './components/VotingApp.jsx'
+import ResultsSummary from './components/ResultsSummary.jsx'
+import SankeyPage from './components/SankeyPage.jsx'
+import AdminPage from './components/AdminPage.jsx'
 
 export default function App() {
   const { state } = useApp()
@@ -15,6 +18,10 @@ export default function App() {
       />
       {/* Login is a stub for the mock: registration creates the session. */}
       <Route path="/login" element={<Navigate to="/register" replace />} />
+      {/* Public pages — no registration required. */}
+      <Route path="/results" element={<ResultsSummary />} />
+      <Route path="/results/:contestId" element={<SankeyPage />} />
+      <Route path="/admin" element={<AdminPage />} />
       <Route
         path="/app"
         element={registered ? <VotingApp /> : <Navigate to="/register" replace />}

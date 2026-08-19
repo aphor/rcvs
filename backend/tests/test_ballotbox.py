@@ -30,6 +30,7 @@ def test_flavor_ranking_orders_by_rank():
 
 
 def test_cast_persists_anonymous_ballot(client, app):
+    app.polls.open()
     beers = list(app.resources.beer_brewery_map.keys())
     res = client.post(
         "/api/ballot",
@@ -48,6 +49,7 @@ def test_cast_persists_anonymous_ballot(client, app):
     assert not (PII_KEYS & set(stored.keys()))
 
 
-def test_empty_ballot_rejected(client):
+def test_empty_ballot_rejected(client, app):
+    app.polls.open()
     res = client.post("/api/ballot", json={"ballot": [], "flavorRanks": {}})
     assert res.status_code == 400

@@ -70,3 +70,46 @@ def test_never_exceeds_candidate_count_in_rounds():
     ballots = [["A"], ["B"], ["C"], ["D"], ["A", "B"]]
     r = tabulate(ballots, ["A", "B", "C", "D"])
     assert len(r["rounds"]) <= len(["A", "B", "C", "D"])
+
+
+def test_standings_orders_winner_then_by_elimination():
+    ballots = [["A"], ["A"], ["B"], ["B"], ["C", "A"]]
+    r = tabulate(ballots, ["A", "B", "C"])
+    places = {s["candidate"]: s["place"] for s in r["standings"]}
+    assert places["A"] == 1  # winner
+    assert places["B"] == 2  # survived to the final round
+    assert places["C"] == 3  # eliminated first
+    assert r["standings"][0]["votes"] == 3  # A's final tally
+
+
+def test_sankey_captures_transfer_flow():
+    # C is eliminated; its ballot [C, A] must flow C -> A between rounds 0 and 1.
+    ballots = [["A"], ["A"], ["B"], ["B"], ["C", "A"]]
+    r = tabulate(ballots, ["A", "B", "C"])
+    sk = r["sankey"]
+    assert sk["num_rounds"] == 2
+    transfer = next(
+        l for l in sk["links"] if l["source"] == "0:C" and l["target"] == "1:A"
+    )
+    assert transfer["value"] == 1
+    # Round-1 node for A accumulates the transfer: 2 -> 3.
+    a_final = next(n for n in sk["nodes"] if n["id"] == "1:A")
+    assert a_final["value"] == 3
+
+
+def test_rank_tallies_count_choice_positions():
+    ballots = [["A", "B"], ["A", "C"], ["B", "A"], ["C"]]
+    r = tabulate(ballots, ["A", "B", "C"])
+    tallies = {s["candidate"]: s["rank_tallies"] for s in r["standings"]}
+    assert tallies["A"] == [2, 1]  # 1st twice, 2nd once
+    assert tallies["B"] == [1, 1]
+    assert tallies["C"] == [1, 1]
+
+
+def test_sankey_records_exhausted_flow():
+    # B is eliminated with a truncated ballot -> it exhausts.
+    ballots = [["A"], ["A"], ["A"], ["A"], ["B"], ["B"], ["B"], ["C"], ["C"], ["C"]]
+    r = tabulate(ballots, ["A", "B", "C"])
+    sk = r["sankey"]
+    assert any(n["exhausted"] for n in sk["nodes"])
+    assert any(l["target"].endswith(":__exhausted__") for l in sk["links"])

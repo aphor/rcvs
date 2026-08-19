@@ -70,6 +70,7 @@ class SqlitePersistence(PersistenceInterface):
         """
         try:
             table_name = self._table_name_for_type(model_type)
+            self._create_table(table_name)  # on-demand for types beyond the core models
             serialized = json.dumps(data)
             record_id = data.get("id")
 
@@ -101,6 +102,7 @@ class SqlitePersistence(PersistenceInterface):
         """
         try:
             table_name = self._table_name_for_type(model_type)
+            self._create_table(table_name)
             cursor = self.connection.cursor()
             cursor.execute(f"SELECT data FROM {table_name} WHERE id = ?", (record_id,))
             row = cursor.fetchone()
@@ -116,6 +118,7 @@ class SqlitePersistence(PersistenceInterface):
         queryable columns, so callers filter in Python."""
         try:
             table_name = self._table_name_for_type(model_type)
+            self._create_table(table_name)
             cursor = self.connection.cursor()
             cursor.execute(f"SELECT data FROM {table_name}")
             return [json.loads(row["data"]) for row in cursor.fetchall()]

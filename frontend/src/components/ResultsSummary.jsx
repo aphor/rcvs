@@ -27,6 +27,11 @@ function lastRankUsed(rows) {
   return Math.min(max, MAX_RANK_COLS)
 }
 
+// tabulate() reports how the contest ended: majority | sole | tie | exhausted.
+// Most read naturally as "by <reason> of continuing ballots"; exhaustion does not.
+const byText = (winnerBy) =>
+  winnerBy === 'exhausted' ? 'by exhaustion of ballots' : `by ${winnerBy} of continuing ballots`
+
 function ResultCard({ contest, result, notCounted }) {
   const top = (result?.standings || []).slice(0, 3)
   const rankCols = Array.from({ length: lastRankUsed(top) }, (_, i) => i + 1)
@@ -47,7 +52,7 @@ function ResultCard({ contest, result, notCounted }) {
       <h2>{contest.name}</h2>
       <p className="winner-line">
         🏆 Winner: <strong>{result?.winner_name || '—'}</strong>
-        {result?.winner_by && <span className="by-tag">by {result.winner_by} of continuing ballots</span>}
+        {result?.winner_by && <span className="by-tag">{byText(result.winner_by)}</span>}
       </p>
 
       <div className="standings-scroll">

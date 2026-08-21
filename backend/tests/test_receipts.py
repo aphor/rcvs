@@ -73,3 +73,34 @@ def test_any_single_contact_detail_suppresses_imputation(client, app):
     r = app.receipt_store.load_all("receipt")[0]
     assert r["firstname"] == ""
     assert r["mobile"] == "555-1234"
+
+
+def test_receipt_type_records_the_voting_window(client, app):
+    """A receipt is annotated with whether voting was open when it arrived."""
+    client.post("/api/receipt", json={"user": {"email": "early@x.z"}, "feedback": {}})
+    app.polls.open()
+    client.post("/api/receipt", json={"user": {"email": "during@x.z"}, "feedback": {}})
+    app.polls.close()
+    client.post("/api/receipt", json={"user": {"email": "late@x.z"}, "feedback": {}})
+
+    by_email = {r["email"]: r["receipt_type"] for r in app.receipt_store.load_all("receipt")}
+    assert by_email == {
+        "early@x.z": "before_open",
+        "during@x.z": "vote",
+        "late@x.z": "after_close",
+    }
+
+
+def test_feedback_text_never_reaches_the_ballot_box(client, app):
+    """Questions and suggestions belong to the receipt store, never the votes."""
+    app.polls.open()
+    beers = list(app.resources.beer_brewery_map.keys())
+    client.post("/api/ballot", json={"ballot": [beers[0]], "flavorRanks": {}})
+    client.post(
+        "/api/receipt",
+        json={"user": {}, "feedback": {"text": "SECRET-COMMENT", "contactMe": True}},
+    )
+
+    dumped = repr(app.election_store.load_all("ballot"))
+    assert "SECRET-COMMENT" not in dumped
+    assert any(r["comments"] == "SECRET-COMMENT" for r in app.receipt_store.load_all("receipt"))

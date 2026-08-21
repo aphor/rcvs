@@ -56,7 +56,10 @@ function reducer(state, action) {
 
     case 'CAST_BALLOT':
       if (state.ballot.length === 0) return state
-      return { ...state, ballotCast: true }
+      return { ...state, ballotCast: true, castError: null }
+
+    case 'CAST_REJECTED': // server refused the ballot; nothing was recorded
+      return { ...state, ballotCast: false, castError: action.error }
 
     case 'SET_RECEIPT': // ballot-box signature, arrives async after cast
       return { ...state, receipt: action.receipt }
@@ -87,13 +90,19 @@ export function AppProvider({ children }) {
       reorder: (ballot) => dispatch({ type: 'REORDER', ballot }),
       setFlavorRanks: (ranks) => dispatch({ type: 'SET_FLAVOR_RANKS', ranks }),
       setFeedback: (feedback) => dispatch({ type: 'SET_FEEDBACK', feedback }),
-      castBallot: () => {
+      castBallot: async () => {
         if (state.ballot.length === 0) return
+        // The server is authoritative: a ballot it refuses (polls not open) must
+        // not be shown as cast, so wait for the outcome before marking it.
+        const res = await submitCastBallot(state)
+        if (!res.ok && res.error === 'polls_not_open') {
+          return dispatch({ type: 'CAST_REJECTED', error: 'polls_not_open' })
+        }
+        if (!res.ok && res.status === 0) {
+          return dispatch({ type: 'CAST_REJECTED', error: 'unreachable' })
+        }
         dispatch({ type: 'CAST_BALLOT' })
-        // Best-effort backend submit; the offline mock works regardless.
-        submitCastBallot(state).then((receipt) => {
-          if (receipt) dispatch({ type: 'SET_RECEIPT', receipt })
-        })
+        if (res.receipt) dispatch({ type: 'SET_RECEIPT', receipt: res.receipt })
       },
       reset: () => {
         clearSession()

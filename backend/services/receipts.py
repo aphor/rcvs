@@ -8,6 +8,11 @@ from uuid import uuid4
 from flask import Blueprint, request, jsonify
 
 from backend.models import Receipt
+from backend.services.polls import CLOSED, OPEN
+
+# A receipt that did not accompany a vote, because voting had not started or
+# had already finished, is recorded as such.
+_RECEIPT_TYPE = {OPEN: "vote", CLOSED: "after_close"}
 
 # The registration form's contact fields, all optional.
 _CONTACT_FIELDS = ("firstname", "lastname", "mobile", "phone", "email")
@@ -25,7 +30,7 @@ def client_ip() -> str:
     return request.remote_addr or ""
 
 
-def create_blueprint(store) -> Blueprint:
+def create_blueprint(store, polls) -> Blueprint:
     bp = Blueprint("receipts", __name__)
 
     @bp.route("/api/receipt", methods=["POST"])
@@ -50,6 +55,7 @@ def create_blueprint(store) -> Blueprint:
             email=contact["email"],
             comments=feedback.get("text", ""),
             contact_me=bool(feedback.get("contactMe", False)),
+            receipt_type=_RECEIPT_TYPE.get(polls.status(), "before_open"),
         )
         store.save(receipt.to_dict(), "receipt")
         return jsonify({"receiptId": receipt.id})

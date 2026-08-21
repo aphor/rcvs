@@ -12,6 +12,7 @@ is algebraically 2*leader > continuing_total and may fire in any round. We also
 stop at a sole remaining candidate or when every ballot is exhausted.
 """
 
+from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
 from flask import Blueprint, jsonify
@@ -173,6 +174,28 @@ def _sankey(holders_per_round: List[List[Optional[str]]]) -> Dict[str, Any]:
     return {"num_rounds": num_rounds, "nodes": nodes, "links": links}
 
 
+def results_for(store, resources, contest_id) -> Dict[str, Any]:
+    """Tabulate one contest from the ballots currently in the store, enriched
+    with display names. Shared by the results route and the cycle archive."""
+    ballots = []
+    for row in store.load_all("ballot"):
+        ranked = (row.get("cast_data") or {}).get(contest_id)
+        if ranked:
+            ballots.append(ranked)
+
+    result = tabulate(ballots, resources.candidate_ids(contest_id))
+
+    name = lambda cid: resources.candidate_name(contest_id, cid)
+    for s in result["standings"]:
+        s["name"] = name(s["candidate"])
+    for n in result["sankey"]["nodes"]:
+        n["label"] = "Exhausted" if n["exhausted"] else name(n["candidate"])
+    result["contest_id"] = contest_id
+    result["ballots_counted"] = len(ballots)
+    result["winner_name"] = name(result["winner"]) if result["winner"] else None
+    return result
+
+
 def create_results_blueprint(store, resources, polls) -> Blueprint:
     bp = Blueprint("results", __name__)
 
@@ -186,8 +209,15 @@ def create_results_blueprint(store, resources, polls) -> Blueprint:
 
     @bp.route("/api/polls/status", methods=["GET"])
     def poll_status():
+        # server_time lets clients run countdowns off our clock, not the device's.
         return jsonify(
-            {"status": polls.status(), "open": polls.is_open(), "closed": polls.is_closed()}
+            {
+                "status": polls.status(),
+                "open": polls.is_open(),
+                "closed": polls.is_closed(),
+                "server_time": datetime.now(timezone.utc).isoformat(),
+                **polls.scheduled(),
+            }
         )
 
     @bp.route("/api/results/<contest_id>", methods=["GET"])
@@ -205,24 +235,6 @@ def create_results_blueprint(store, resources, polls) -> Blueprint:
         if contest_id not in resources.contest_ids():
             return jsonify({"error": f"unknown contest: {contest_id}"}), 404
 
-        ballots = []
-        for row in store.load_all("ballot"):
-            ranked = (row.get("cast_data") or {}).get(contest_id)
-            if ranked:
-                ballots.append(ranked)
-
-        candidates = resources.candidate_ids(contest_id)
-        result = tabulate(ballots, candidates)
-
-        # Enrich with display names.
-        name = lambda cid: resources.candidate_name(contest_id, cid)
-        for s in result["standings"]:
-            s["name"] = name(s["candidate"])
-        for n in result["sankey"]["nodes"]:
-            n["label"] = "Exhausted" if n["exhausted"] else name(n["candidate"])
-        result["contest_id"] = contest_id
-        result["ballots_counted"] = len(ballots)
-        result["winner_name"] = name(result["winner"]) if result["winner"] else None
-        return jsonify(result)
+        return jsonify(results_for(store, resources, contest_id))
 
     return bp

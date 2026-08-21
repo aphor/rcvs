@@ -751,6 +751,36 @@ body {
   fill: var(--ink);
 }
 
+/* Poll status + countdown (ballot pages) */
+.poll-status-bar {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.poll-countdown {
+  display: inline-flex;
+  gap: 5px;
+  align-items: baseline;
+}
+.cast-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #eccfc9;
+  color: var(--red);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.cast-error a {
+  color: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* Admin */
 .admin-status {
   margin: 0 0 16px;
@@ -776,6 +806,36 @@ body {
 .poll-unreachable {
   background: var(--line);
   color: var(--muted);
+}
+.admin-schedule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.admin-schedule .poll-countdown {
+  margin-left: 8px;
+}
+.admin-hint {
+  margin: -6px 0 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.btn-small {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+.btn-link {
+  background: none;
+  border: 0;
+  padding: 0 0 0 6px;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 .admin-actions {
   display: flex;

@@ -16,5 +16,8 @@ class PersistenceInterface:
     def delete(self, model_type: str, identifier: str) -> bool:
         raise NotImplementedError("delete method must be implemented by subclasses")
 
+    def delete_all(self, model_type: str) -> int:
+        raise NotImplementedError("delete_all method must be implemented by subclasses")
+
     def exists(self, model_type: str, identifier: str) -> bool:
         raise NotImplementedError("exists method must be implemented by subclasses")

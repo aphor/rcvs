@@ -33,7 +33,7 @@ def create_app(
     from backend.models import SqlitePersistence
     from backend.services.resources import Resources
     from backend.services.polls import Polls
-    from backend.services import ballotbox, receipts, tabulator, admin
+    from backend.services import archive, ballotbox, receipts, tabulator, admin
     from backend.routes import main_bp
 
     election_store = SqlitePersistence(ballotbox_db)
@@ -41,12 +41,17 @@ def create_app(
 
     resources = Resources(resource_dir) if resource_dir else Resources()
     resources.seed(election_store)
-    polls = Polls(election_store)
+    # Closing a cycle archives it; opening the next one clears the old ballots.
+    polls = Polls(
+        election_store,
+        on_open=lambda: archive.clear_ballots(election_store),
+        on_close=lambda: archive.archive_cycle(election_store, resources),
+    )
     password = admin_password or os.environ.get("RCVS_ADMIN_PASSWORD", "opensesame")
 
     app.register_blueprint(main_bp)
     app.register_blueprint(ballotbox.create_blueprint(election_store, resources, polls))
-    app.register_blueprint(receipts.create_blueprint(receipt_store))
+    app.register_blueprint(receipts.create_blueprint(receipt_store, polls))
     app.register_blueprint(tabulator.create_results_blueprint(election_store, resources, polls))
     app.register_blueprint(admin.create_blueprint(polls, password))
 

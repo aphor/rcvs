@@ -19,6 +19,9 @@ class Receipt:
     email: str = ""
     comments: str = ""
     contact_me: bool = False
+    # Whether this accompanied a vote, or arrived outside the voting window:
+    # "vote" | "before_open" | "after_close".
+    receipt_type: str = "vote"
     created_at: str = ""
 
     def __post_init__(self):
@@ -35,6 +38,7 @@ class Receipt:
             "email": self.email,
             "comments": self.comments,
             "contact_me": self.contact_me,
+            "receipt_type": self.receipt_type,
             "created_at": self.created_at,
         }
 
@@ -49,5 +53,6 @@ class Receipt:
             email=data.get("email", ""),
             comments=data.get("comments", ""),
             contact_me=data.get("contact_me", False),
+            receipt_type=data.get("receipt_type", "vote"),
             created_at=data.get("created_at", ""),
         )

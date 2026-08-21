@@ -137,6 +137,19 @@ class SqlitePersistence(PersistenceInterface):
             print(f"Error deleting data from SQLite: {e}")
             return False
 
+    def delete_all(self, model_type: str) -> int:
+        """Drop every record of a model type; returns how many were removed."""
+        try:
+            table_name = self._table_name_for_type(model_type)
+            self._create_table(table_name)
+            cursor = self.connection.cursor()
+            cursor.execute(f"DELETE FROM {table_name}")
+            self.connection.commit()
+            return cursor.rowcount
+        except Exception as e:
+            print(f"Error deleting all data from SQLite: {e}")
+            return 0
+
     def exists(self, model_type: str, identifier: str) -> bool:
         try:
             table_name = self._table_name_for_type(model_type)

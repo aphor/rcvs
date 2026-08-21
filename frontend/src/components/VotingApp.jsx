@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext.jsx'
+import { usePollStatus } from '../lib/usePollStatus.js'
+import PollStatusBar from './PollStatusBar.jsx'
 import BeerPicker from './BeerPicker.jsx'
 import Ballot from './Ballot.jsx'
 import VoteButton from './VoteButton.jsx'
@@ -7,6 +9,7 @@ import ConfirmModal from './ConfirmModal.jsx'
 
 export default function VotingApp() {
   const { state, reset } = useApp()
+  const poll = usePollStatus()
   const [view, setView] = useState('picker') // 'picker' | 'ballot'
   const [confirmReset, setConfirmReset] = useState(false)
 
@@ -24,6 +27,11 @@ export default function VotingApp() {
 
       {view === 'picker' ? (
         <>
+          <PollStatusBar
+            status={poll.status}
+            scheduledOp={poll.scheduledOp}
+            msRemaining={poll.msRemaining}
+          />
           <BeerPicker />
           {state.ballot.length >= 1 && <VoteButton onClick={() => setView('ballot')} />}
         </>

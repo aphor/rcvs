@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   DndContext,
   KeyboardSensor,
@@ -15,6 +16,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useApp } from '../context/AppContext.jsx'
+import { usePollStatus } from '../lib/usePollStatus.js'
+import PollStatusBar from './PollStatusBar.jsx'
 import { getBeer, breweryCount } from '../data/beers.js'
 import BallotCard from './BallotCard.jsx'
 import FlavorBallot from './FlavorBallot.jsx'
@@ -33,6 +36,7 @@ export default function Ballot({ onBrowse }) {
   const { state, promote, demote, removeBeer, reorder, setFlavorRanks, setFeedback, castBallot } =
     useApp()
   const cast = state.ballotCast
+  const poll = usePollStatus()
 
   const [card, setCard] = useState(0)
   const [viewed, setViewed] = useState(() => new Set([0]))
@@ -63,7 +67,7 @@ export default function Ballot({ onBrowse }) {
   const confirmModal = () => {
     if (!modal) return
     if (modal.type === 'remove') removeBeer(modal.id)
-    if (modal.type === 'cast') castBallot()
+    if (modal.type === 'cast') castBallot().then(poll.refresh)
     setModal(null)
   }
 
@@ -76,7 +80,28 @@ export default function Ballot({ onBrowse }) {
       </div>
 
       <div className="ballot-body">
+        <PollStatusBar
+          status={poll.status}
+          scheduledOp={poll.scheduledOp}
+          msRemaining={poll.msRemaining}
+        />
+
         {cast && <p className="cast-banner">✓ Ballot cast — thanks for voting!</p>}
+
+        {!cast && state.castError === 'polls_not_open' && (
+          <p className="cast-error">
+            Your ballot was <strong>not</strong> accepted: voting{' '}
+            {poll.status === 'closed' ? 'has closed' : 'has not opened yet'}. Your rankings are still
+            here — cast again once voting is open.{' '}
+            <Link to="/results">See the results →</Link>
+          </p>
+        )}
+        {!cast && state.castError === 'unreachable' && (
+          <p className="cast-error">
+            Your ballot was <strong>not</strong> accepted: the server could not be reached. Your
+            rankings are still here — try again in a moment.
+          </p>
+        )}
 
         {card === 0 && (
           <>
@@ -135,8 +160,14 @@ export default function Ballot({ onBrowse }) {
           type="button"
           className="btn btn-cast"
           onClick={() => setModal({ type: 'cast' })}
-          disabled={cast || !allViewed}
-          title={!allViewed ? 'Preview all ballot cards first' : undefined}
+          disabled={cast || !allViewed || (poll.status !== null && !poll.isOpen)}
+          title={
+            !allViewed
+              ? 'Preview all ballot cards first'
+              : poll.status && !poll.isOpen
+                ? 'Voting is not open'
+                : undefined
+          }
         >
           CAST BALLOT
         </button>

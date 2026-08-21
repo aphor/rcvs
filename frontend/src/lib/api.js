@@ -26,18 +26,29 @@ async function request(method, path, body) {
   }
 }
 
-// Best-effort: returns the ballot-box receipt (signature) or null.
+// Casts the rankings and files the receipt as two independent submissions.
+// The receipt (contact details + questions/suggestions) is sent either way: the
+// server annotates it with whether voting was open, so feedback left before or
+// after the voting window is still recorded. Returns the ballot outcome so the
+// UI can refuse to call a rejected ballot cast.
 export async function submitCastBallot(session) {
   const b = await request('POST', '/api/ballot', {
     ballot: session.ballot,
     flavorRanks: session.flavorRanks,
   })
   await request('POST', '/api/receipt', { user: session.user, feedback: session.feedback })
-  return b.ok && b.data ? (b.data.receipt ?? null) : null
+  return {
+    ok: b.ok,
+    status: b.status,
+    error: b.data?.error ?? null,
+    receipt: b.ok && b.data ? (b.data.receipt ?? null) : null,
+  }
 }
 
 export const getPollStatus = () => request('GET', '/api/polls/status')
 export const getContests = () => request('GET', '/api/contests')
 export const getResults = (contestId) => request('GET', `/api/results/${contestId}`)
-export const adminOpen = (password) => request('POST', '/api/admin/open', { password })
-export const adminClose = (password) => request('POST', '/api/admin/close', { password })
+// `at` is an ISO-8601 instant; omitting it runs the operation immediately.
+export const adminOpen = (password, at) => request('POST', '/api/admin/open', { password, at })
+export const adminClose = (password, at) => request('POST', '/api/admin/close', { password, at })
+export const adminCancel = (password, op) => request('POST', '/api/admin/cancel', { password, op })

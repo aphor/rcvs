@@ -31,7 +31,7 @@ export default function SankeyPage() {
     <div className="screen wide-screen">
       <header className="app-header compact">
         <h1>How voters decided</h1>
-        {result && (
+        {result && Boolean(result.ballots_counted) && (
           <p className="subtitle">
             🏆 {result.winner_name || '—'} won this contest — {result.ballots_counted} ballots
           </p>
@@ -57,7 +57,8 @@ export default function SankeyPage() {
       {state.notClosed && (
         <p className="polls-msg">Polls have not yet closed! Please try again later.</p>
       )}
-      {result && (
+      {result && !result.ballots_counted && <p className="not-counted">Not counted yet.</p>}
+      {result && Boolean(result.ballots_counted) && (
         <>
           <p className="sankey-help">
             Each column is a round. Bars are candidates sized by their votes; ribbons show ballots

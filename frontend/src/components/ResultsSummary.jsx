@@ -27,9 +27,20 @@ function lastRankUsed(rows) {
   return Math.min(max, MAX_RANK_COLS)
 }
 
-function ResultCard({ contest, result }) {
+function ResultCard({ contest, result, notCounted }) {
   const top = (result?.standings || []).slice(0, 3)
   const rankCols = Array.from({ length: lastRankUsed(top) }, (_, i) => i + 1)
+
+  // Nothing to show when no ballots were cast, or when a fresh cycle is queued
+  // and the standings on hand belong to a run that is over.
+  if (notCounted) {
+    return (
+      <div className="card result-card">
+        <h2>{contest.name}</h2>
+        <p className="not-counted">Not counted yet.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="card result-card">
@@ -121,7 +132,12 @@ export default function ResultsSummary() {
       )}
       {state.contests &&
         state.contests.map((c, i) => (
-          <ResultCard key={c.id} contest={c} result={state.results[i]} />
+          <ResultCard
+            key={c.id}
+            contest={c}
+            result={state.results[i]}
+            notCounted={Boolean(poll.scheduledOpenAt) || !state.results[i]?.ballots_counted}
+          />
         ))}
     </div>
   )

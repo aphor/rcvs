@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getPollStatus, getContests, getResults } from '../lib/api.js'
+import { getContests, getResults } from '../lib/api.js'
+import { usePollStatus } from '../lib/usePollStatus.js'
+import PollStatusBar from './PollStatusBar.jsx'
 
 const MEDALS = ['🥇', '🥈', '🥉']
 const MAX_RANK_COLS = 8
@@ -77,14 +79,17 @@ function ResultCard({ contest, result }) {
 
 export default function ResultsSummary() {
   const [state, setState] = useState({ loading: true })
+  // The shared hook also keeps the status fresh, so a page left open while the
+  // polls are still running loads the results by itself once they close.
+  const poll = usePollStatus()
 
   useEffect(() => {
+    if (poll.unreachable) return setState({ error: 'server' })
+    if (poll.status === null) return
+    if (poll.status !== 'closed') return setState({ notClosed: true })
+
     let alive = true
     ;(async () => {
-      const status = await getPollStatus()
-      if (!alive) return
-      if (status.networkError) return setState({ error: 'server' })
-      if (!status.data?.closed) return setState({ notClosed: true })
       const contests = (await getContests()).data || []
       const results = await Promise.all(contests.map((c) => getResults(c.id)))
       if (alive) setState({ contests, results: results.map((r) => r.data) })
@@ -92,7 +97,7 @@ export default function ResultsSummary() {
     return () => {
       alive = false
     }
-  }, [])
+  }, [poll.status, poll.unreachable])
 
   return (
     <div className="screen">
@@ -100,6 +105,12 @@ export default function ResultsSummary() {
         <h1>🍺 Election Results</h1>
         <p className="subtitle">Oak Park Microbrew Review 2026</p>
       </header>
+
+      <PollStatusBar
+        status={poll.status}
+        scheduledOp={poll.scheduledOp}
+        msRemaining={poll.msRemaining}
+      />
 
       {state.loading && <p className="results-msg">Loading results…</p>}
       {state.error && (

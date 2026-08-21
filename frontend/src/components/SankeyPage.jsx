@@ -1,26 +1,29 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getPollStatus, getResults } from '../lib/api.js'
+import { getResults } from '../lib/api.js'
+import { usePollStatus } from '../lib/usePollStatus.js'
+import PollStatusBar from './PollStatusBar.jsx'
 import Sankey from './Sankey.jsx'
 
 export default function SankeyPage() {
   const { contestId } = useParams()
   const [state, setState] = useState({ loading: true })
+  const poll = usePollStatus()
 
   useEffect(() => {
+    if (poll.unreachable) return setState({ error: 'server' })
+    if (poll.status === null) return
+    if (poll.status !== 'closed') return setState({ notClosed: true })
+
     let alive = true
     ;(async () => {
-      const status = await getPollStatus()
-      if (!alive) return
-      if (status.networkError) return setState({ error: 'server' })
-      if (!status.data?.closed) return setState({ notClosed: true })
       const res = await getResults(contestId)
       if (alive) setState({ result: res.data })
     })()
     return () => {
       alive = false
     }
-  }, [contestId])
+  }, [contestId, poll.status, poll.unreachable])
 
   const result = state.result
 
@@ -40,6 +43,12 @@ export default function SankeyPage() {
           ‹ Back to results
         </Link>
       </p>
+
+      <PollStatusBar
+        status={poll.status}
+        scheduledOp={poll.scheduledOp}
+        msRemaining={poll.msRemaining}
+      />
 
       {state.loading && <p className="results-msg">Loading…</p>}
       {state.error && (

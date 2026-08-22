@@ -31,8 +31,8 @@ const INTRO = [
 	  afterwards here or by email if you provide valid contact information at registration.
         </p>
 	<p>
-	  Results will be counted for favorite brewery and beer flavor profile by <strong>instant-runoff</strong>
-	  by multiple rounds until an absolute majority winner is counted, or until all next-choice preferences
+	  Results will be counted for favorite brewery and beer flavor profile by <strong>instant-runoff</strong>,
+	  for multiple rounds until an absolute majority winner is counted, or until all next-choice preferences
 	  from the prior round have been exhausted (wouldn't change the outcome).
 	</p>
         <p>

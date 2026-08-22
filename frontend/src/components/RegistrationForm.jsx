@@ -55,7 +55,7 @@ export default function RegistrationForm() {
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>🍺 Favorite Beer Vote</h1>
+        <h1>🍺 People&rsquo;s Choice Brewery</h1>
         <p className="subtitle">Oak Park Microbrew Review 2026</p>
       </header>
 

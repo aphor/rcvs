@@ -11,7 +11,8 @@ const INTRO = [
     body: (
       <>
         <p>
-          Welcome to the <strong>Oak Park Microbrew Review 2026</strong> Ranked Choice Favorite Beer Vote.
+          Welcome to the <strong>Oak Park Microbrew Review 2026</strong> Ranked Choice People&rsquo;s Choice
+          Brewery vote.
         </p>
         <p>
           This is a <strong>ranked-choice election</strong>: participating brewers have nominated a beer
@@ -89,7 +90,7 @@ export default function Welcome() {
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>🍺 Favorite Beer Vote</h1>
+        <h1>🍺 People&rsquo;s Choice Brewery</h1>
         <p className="subtitle">Oak Park Microbrew Review 2026</p>
       </header>
 

@@ -21,7 +21,7 @@ export default function VotingApp() {
         <button type="button" className="start-over" onClick={() => setConfirmReset(true)}>
           Start over
         </button>
-        <h1>🍺 Favorite Beer Vote</h1>
+        <h1>🍺 People&rsquo;s Choice Brewery</h1>
         <p className="subtitle">
           Hi, {state.user?.firstname}! Tasted {state.ballot.length} beer
           {state.ballot.length === 1 ? '' : 's'} · {breweries} brewer

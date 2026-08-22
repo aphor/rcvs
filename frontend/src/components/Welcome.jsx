@@ -14,25 +14,26 @@ const INTRO = [
           Welcome to the <strong>Oak Park Microbrew Review 2026</strong> Ranked Choice Favorite Beer Vote.
         </p>
         <p>
-          This is a <strong>ranked-choice election</strong>: rather than picking a single favorite,
-          you rank the beers you taste in order of preference. This is designed to give you a feel
-          for how ranked choice voting works. You can move the choices up and down in the list to 
-          reflect your preference from top to bottom.
+          This is a <strong>ranked-choice election</strong>: participating brewers have nominated a beer
+	  to represent them. You rank the candidates in the order of your preference for their beers.
+	  This is designed to give you a feel for how ranked choice voting works. You can move the choices
+	  up and down in the list to reflect your preference from top to bottom.
         </p>
         <p>
-          With dozens of breweries pouring, beer rankings will be counted <strong>by brewery</strong>
-          so that everyone's choices taken together clearly indicate a winner.
-        </p>
-        <p>
-          You may also rank broad <strong>flavor profiles</strong> and to share any
+          The ballot also provides a choice to rank broad <strong>flavor profiles</strong> and to share any
           questions or suggestions. For this, fill in one circle per flavor per ranking, as you would
           fill in circles on a political election ballot form.
         </p>
         <p>
           This election is conducted by <strong>FairVote Illinois</strong> to showcase ranked-choice voting in a
-          fun, low-stakes setting. Voting is open throughout the festival, with results announced afterwards by
-          email if you provide valid contact information at registration.
+          fun, low-stakes setting. Voting is open shortly after the start of the festival, with results available
+	  afterwards here or by email if you provide valid contact information at registration.
         </p>
+	<p>
+	  Results will be counted for favorite brewery and beer flavor profile by <strong>instant-runoff</strong>
+	  by multiple rounds until an absolute majority winner is counted, or until all next-choice preferences
+	  from the prior round have been exhausted (wouldn't change the outcome).
+	</p>
         <p>
           FairVote promises to respect your privacy, and will not share your contact information with anyone
           except to respond to your comments or questions if you tell us you would like to be contacted.

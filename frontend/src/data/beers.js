@@ -510,6 +510,28 @@ export const getBeer = (id) => byId.get(id)
 export const breweries = [...new Set(beers.map((b) => b.brewery))]
 export const breweryCount = breweries.length
 
+// Fold a ranked list of beer ids into the ranked breweries it expresses: a
+// brewery takes the position of its highest-ranked beer, exactly as the server
+// does in brewery_ranking() (backend/services/ballotbox.py). The ballot ranks
+// breweries, so what is shown here has to match what gets counted.
+export function groupByBrewery(ballotIds) {
+  const groups = []
+  const bySlug = new Map()
+  for (const id of ballotIds) {
+    const beer = byId.get(id)
+    if (!beer) continue
+    let group = bySlug.get(beer.brewerySlug)
+    if (!group) {
+      group = { slug: beer.brewerySlug, brewery: beer.brewery, beers: [], flavors: [] }
+      bySlug.set(beer.brewerySlug, group)
+      groups.push(group)
+    }
+    group.beers.push(beer)
+    if (!group.flavors.includes(beer.flavor)) group.flavors.push(beer.flavor)
+  }
+  return groups
+}
+
 // Case-insensitive relevance search over name, brewery, and style. Results are
 // returned best-match-first in three tiers, each beer appearing once in its
 // strongest tier:

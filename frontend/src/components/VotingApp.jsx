@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext.jsx'
+import { groupByBrewery } from '../data/beers.js'
 import { usePollStatus } from '../lib/usePollStatus.js'
 import PollStatusBar from './PollStatusBar.jsx'
 import BeerPicker from './BeerPicker.jsx'
@@ -10,6 +11,7 @@ import ConfirmModal from './ConfirmModal.jsx'
 export default function VotingApp() {
   const { state, reset } = useApp()
   const poll = usePollStatus()
+  const breweries = groupByBrewery(state.ballot).length
   const [view, setView] = useState('picker') // 'picker' | 'ballot'
   const [confirmReset, setConfirmReset] = useState(false)
 
@@ -21,7 +23,9 @@ export default function VotingApp() {
         </button>
         <h1>🍺 Favorite Beer Vote</h1>
         <p className="subtitle">
-          Hi, {state.user?.firstname}! Tasted {state.ballot.length}
+          Hi, {state.user?.firstname}! Tasted {state.ballot.length} beer
+          {state.ballot.length === 1 ? '' : 's'} · {breweries} brewer
+          {breweries === 1 ? 'y' : 'ies'}
         </p>
       </header>
 

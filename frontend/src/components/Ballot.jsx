@@ -18,8 +18,8 @@ import {
 import { useApp } from '../context/AppContext.jsx'
 import { usePollStatus } from '../lib/usePollStatus.js'
 import PollStatusBar from './PollStatusBar.jsx'
-import { getBeer, breweryCount } from '../data/beers.js'
-import BallotCard from './BallotCard.jsx'
+import { groupByBrewery } from '../data/beers.js'
+import BreweryBallotCard from './BreweryBallotCard.jsx'
 import FlavorBallot from './FlavorBallot.jsx'
 import FeedbackCard from './FeedbackCard.jsx'
 import ConfirmModal from './ConfirmModal.jsx'
@@ -27,20 +27,33 @@ import ConfirmModal from './ConfirmModal.jsx'
 // The ballot is a small pager of cards; the cast button unlocks only once every
 // card has been viewed.
 const CARDS = [
-  { key: 'beers', title: 'Rank your beers' },
+  { key: 'breweries', title: 'Rank the breweries you tasted' },
   { key: 'flavors', title: 'Rank flavor profiles' },
   { key: 'feedback', title: 'Questions & suggestions' },
 ]
 
 export default function Ballot({ onBrowse }) {
-  const { state, promote, demote, removeBeer, reorder, setFlavorRanks, setFeedback, castBallot } =
-    useApp()
+  const { state, reorder, setFlavorRanks, setFeedback, castBallot } = useApp()
   const cast = state.ballotCast
   const poll = usePollStatus()
 
+  // The ballot is stored as a flat list of beer ids — the shape the server
+  // expects — and displayed as the breweries that list expresses. Every move
+  // below reorders whole brewery groups and flattens back to beer ids, so the
+  // stored ballot and the visible ranking never disagree.
+  const groups = groupByBrewery(state.ballot)
+  const flatten = (list) => list.flatMap((g) => g.beers.map((b) => b.id))
+  const moveGroup = (slug, delta) => {
+    const from = groups.findIndex((g) => g.slug === slug)
+    const to = from + delta
+    if (from < 0 || to < 0 || to >= groups.length) return
+    reorder(flatten(arrayMove(groups, from, to)))
+  }
+  const dropGroup = (slug) => reorder(flatten(groups.filter((g) => g.slug !== slug)))
+
   const [card, setCard] = useState(0)
   const [viewed, setViewed] = useState(() => new Set([0]))
-  const [modal, setModal] = useState(null) // null | { type: 'remove', id } | { type: 'cast' }
+  const [modal, setModal] = useState(null) // null | { type: 'remove', slug } | { type: 'cast' }
 
   const go = (index) => {
     if (index < 0 || index >= CARDS.length) return
@@ -59,19 +72,20 @@ export default function Ballot({ onBrowse }) {
 
   const onDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return
-    const from = state.ballot.indexOf(active.id)
-    const to = state.ballot.indexOf(over.id)
-    reorder(arrayMove(state.ballot, from, to))
+    const from = groups.findIndex((g) => g.slug === active.id)
+    const to = groups.findIndex((g) => g.slug === over.id)
+    if (from < 0 || to < 0) return
+    reorder(flatten(arrayMove(groups, from, to)))
   }
 
   const confirmModal = () => {
     if (!modal) return
-    if (modal.type === 'remove') removeBeer(modal.id)
+    if (modal.type === 'remove') dropGroup(modal.slug)
     if (modal.type === 'cast') castBallot().then(poll.refresh)
     setModal(null)
   }
 
-  const removingBeer = modal?.type === 'remove' ? getBeer(modal.id) : null
+  const removing = modal?.type === 'remove' ? groups.find((g) => g.slug === modal.slug) : null
 
   return (
     <div className={cast ? 'ballot ballot-cast' : 'ballot'}>
@@ -109,25 +123,23 @@ export default function Ballot({ onBrowse }) {
               {cast ? 'BROWSE BEERS' : '← ADD MORE BEERS TO BALLOT'}
             </button>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-              <SortableContext items={state.ballot} strategy={verticalListSortingStrategy}>
+              <SortableContext
+                items={groups.map((g) => g.slug)}
+                strategy={verticalListSortingStrategy}
+              >
                 <div className="ballot-list">
-                  {state.ballot.map((id, i) => {
-                    const beer = getBeer(id)
-                    if (!beer) return null
-                    return (
-                      <BallotCard
-                        key={id}
-                        beer={beer}
-                        rank={i + 1}
-                        total={state.ballot.length}
-                        cutoff={breweryCount}
-                        disabled={cast}
-                        onPromote={() => promote(id)}
-                        onDemote={() => demote(id)}
-                        onRemove={() => setModal({ type: 'remove', id })}
-                      />
-                    )
-                  })}
+                  {groups.map((group, i) => (
+                    <BreweryBallotCard
+                      key={group.slug}
+                      group={group}
+                      rank={i + 1}
+                      total={groups.length}
+                      disabled={cast}
+                      onPromote={() => moveGroup(group.slug, -1)}
+                      onDemote={() => moveGroup(group.slug, 1)}
+                      onRemove={() => setModal({ type: 'remove', slug: group.slug })}
+                    />
+                  ))}
                 </div>
               </SortableContext>
             </DndContext>
@@ -184,7 +196,13 @@ export default function Ballot({ onBrowse }) {
       <ConfirmModal
         open={modal?.type === 'remove'}
         title="Remove from ballot?"
-        message={removingBeer ? `Remove “${removingBeer.name}” from your ballot?` : ''}
+        message={
+          removing
+            ? `Remove “${removing.brewery}” from your ballot? This drops ${removing.beers
+                .map((b) => b.name)
+                .join(', ')}.`
+            : ''
+        }
         confirmLabel="Remove"
         danger
         onConfirm={confirmModal}

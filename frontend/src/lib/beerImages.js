@@ -28,3 +28,9 @@ const logos = byStem(logoMods)
 export function getBeerImage(beer) {
   return labels[beer.id] || logos[beer.brewerySlug] || null
 }
+
+// A brewery row on the ballot stands for all of its beers, so it takes the
+// logo — never one member beer's label art.
+export function getBreweryImage(slug) {
+  return logos[slug] || null
+}
